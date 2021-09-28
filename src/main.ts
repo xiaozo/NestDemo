@@ -12,22 +12,21 @@ async function bootstrap() {
   app.use(compression());
   app.useGlobalFilters(new AllExceptionsFilter());
 
+  ///https://github.com/chimurai/http-proxy-middleware 反向代理资源
   var options = {
     // target: 'http://193.168.70.107:3001', // target host
     changeOrigin: true, 
     router: function(req) {
-      if (req.query["id"]) return 'http://193.168.70.107:8080';
-      return 'http://193.168.70.107:3001';
-  }
+      return 'http://193.168.70.107:8080';
+  },
+  pathRewrite: {'^/static' : ''}
 };
-// create the proxy (without context)
 const filter = function (pathname, req) {
   return pathname.match('^/static') && req.method === 'GET';
 };
-
 var exampleProxy = createProxyMiddleware(filter,options);
-
 app.use('/static',exampleProxy);
+
 
   await app.listen(3000);
 
@@ -35,7 +34,6 @@ app.use('/static',exampleProxy);
   // 3.配置静态资源目录
   app1.use(function (req, res, next) { 
     next()
-  
   });
   app1.useGlobalFilters(new AllExceptionsFilter());
 

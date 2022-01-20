@@ -19,7 +19,12 @@ async function bootstrap() {
     router: function(req) {
       return 'http://193.168.70.107:8080';
   },
-  pathRewrite: {'^/static' : ''}
+  pathRewrite: {'^/static' : ''},
+  onProxyRes:function(proxyRes, req, res) {
+    console.log(proxyRes.statusCode);
+    
+    
+  }
 };
 const filter = function (pathname, req) {
   return pathname.match('^/static') && req.method === 'GET';
@@ -30,6 +35,7 @@ app.use('/static',exampleProxy);
 
   await app.listen(3000);
 
+  ///配置静态资源
   const app1 = await NestFactory.create<NestExpressApplication>(AppModule);
   // 3.配置静态资源目录
   app1.use(function (req, res, next) { 
